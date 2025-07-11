@@ -9,6 +9,8 @@ import Contests from './pages/Contests';
 import Leaderboard from './pages/Leaderboard';
 import Analytics from './pages/Analytics';
 import Navbar from './components/Navbar';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 
 
 function App() {
@@ -25,6 +27,8 @@ function App() {
         <Route path="/drafts" element={<Drafts />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </BrowserRouter>
   );
