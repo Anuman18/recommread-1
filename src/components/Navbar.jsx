@@ -18,17 +18,18 @@ function Navbar() {
   };
 
   return (
-    <nav style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      padding: '1rem 2rem',
-      background: '#1a1a1a',
-      color: 'white',
-      flexWrap: 'wrap'
-    }}>
-      <div>
-        <Link to="/" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold' }}>
-          📚 RecommRead
+      <nav style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '1rem 2rem',
+        background: '#111',
+        color: 'white',
+        flexWrap: 'wrap'
+      }}>
+        <div>
+          <Link to="/" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold' }}>
+            📚 RecommRead
         </Link>
       </div>
 
@@ -49,18 +50,22 @@ function Navbar() {
 const linkStyle = {
   color: 'white',
   textDecoration: 'none',
-  padding: '0.25rem 0.5rem',
-  borderRadius: '5px',
-  backgroundColor: '#333'
+  padding: '0.4rem 0.8rem',
+  borderRadius: '6px',
+  backgroundColor: '#222',
+  fontSize: '0.95rem'
 };
 
+
 const buttonStyle = {
+  backgroundColor: '#e63946',
   color: 'white',
-  background: 'red',
   border: 'none',
-  padding: '0.25rem 0.75rem',
-  borderRadius: '5px',
-  cursor: 'pointer'
+  padding: '0.4rem 0.8rem',
+  borderRadius: '6px',
+  cursor: 'pointer',
+  fontWeight: 'bold'
 };
+
 
 export default Navbar;

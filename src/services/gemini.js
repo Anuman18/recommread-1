@@ -1,28 +1,19 @@
-import axios from 'axios';
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+export async function generateStory(prompt) {
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + GEMINI_API_KEY;
 
-export const generateStoryFromPrompt = async (prompt) => {
-  try {
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`,
-      {
-        contents: [{
-          parts: [{ text: `Write a short fictional story based on this prompt: "${prompt}"` }]
-        }]
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      }
-    );
+  const body = {
+    contents: [{ parts: [{ text: `Write a short fictional story about: ${prompt}. Keep it under 300 words.` }] }]
+  };
 
-    const text = response.data.candidates[0]?.content?.parts[0]?.text || '';
-    return text;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
 
-  } catch (error) {
-    console.error('Error generating story:', error);
-    return null;
-  }
-};
+  const data = await response.json();
+  const story = data.candidates?.[0]?.content?.parts?.[0]?.text || "No story generated.";
+  return story;
+}

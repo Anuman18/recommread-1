@@ -1,73 +1,115 @@
 import { useState } from 'react';
-import { generateStoryFromPrompt } from '../services/gemini';
 import supabase from '../services/supabase';
+import { generateStory } from '../services/gemini';
 
 function Write() {
   const [prompt, setPrompt] = useState('');
-  const [generatedStory, setGeneratedStory] = useState('');
   const [loading, setLoading] = useState(false);
+  const [generatedStory, setGeneratedStory] = useState('');
+  const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
 
   const handleGenerate = async () => {
     if (!prompt) return;
     setLoading(true);
     setMessage('');
-    const story = await generateStoryFromPrompt(prompt);
+    const story = await generateStory(prompt);
     setGeneratedStory(story);
     setLoading(false);
   };
 
-  const saveStory = async () => {
+  const handleSave = async () => {
     const user = await supabase.auth.getUser();
-    const userId = user.data.user.id;
+    const userId = user?.data?.user?.id;
+    if (!userId) {
+      setMessage('Please login first.');
+      return;
+    }
 
-    const { error } = await supabase.from('drafts').insert({
-      title: prompt.slice(0, 30),
+    if (!title || !generatedStory) {
+      setMessage('Please enter a title and generate a story first.');
+      return;
+    }
+
+    const { error } = await supabase.from('stories').insert({
+      title,
       content: generatedStory,
-      user_id: userId
+      author_id: userId
     });
 
     if (error) {
-      setMessage('Error saving story: ' + error.message);
+      setMessage('❌ Failed to save story');
     } else {
-      setMessage('Story saved to drafts!');
+      setMessage('✅ Story saved to library!');
+      setPrompt('');
+      setTitle('');
+      setGeneratedStory('');
     }
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '600px', margin: 'auto' }}>
-      <h2>✍️ AI Story Writer</h2>
-      <textarea
-        placeholder="Type your story idea..."
+    <div style={{ padding: '2rem', maxWidth: '700px', margin: 'auto' }}>
+      <h2>✍️ AI Story Generator</h2>
+      <input
+        type="text"
+        placeholder="Enter story idea or genre..."
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
-        rows={4}
-        style={{ width: '100%', padding: '1rem' }}
-      /><br /><br />
-      <button onClick={handleGenerate} style={{ padding: '0.5rem 1rem' }}>
+        style={{
+          width: '100%',
+          padding: '0.5rem',
+          marginBottom: '1rem'
+        }}
+      />
+      <button onClick={handleGenerate} disabled={loading} style={btnStyle}>
         {loading ? 'Generating...' : 'Generate Story'}
-      </button><br /><br />
+      </button>
 
       {generatedStory && (
         <>
-          <div style={{
-            whiteSpace: 'pre-wrap',
-            border: '1px solid #ccc',
-            background: '#f9f9f9',
-            padding: '1rem',
-            borderRadius: '10px'
-          }}>
-            <h3>Your Story:</h3>
-            <p>{generatedStory}</p>
-          </div>
-          <br />
-          <button onClick={saveStory} style={{ padding: '0.5rem 1rem' }}>Save to Drafts</button>
+          <h3 style={{ marginTop: '2rem' }}>📝 Your Story</h3>
+          <textarea
+            value={generatedStory}
+            readOnly
+            rows={10}
+            style={{
+              width: '100%',
+              padding: '1rem',
+              fontFamily: 'monospace',
+              background: '#f4f4f4',
+              borderRadius: '8px'
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Enter a title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '0.5rem',
+              marginTop: '1rem'
+            }}
+          />
+          <button onClick={handleSave} style={btnStyle}>
+            💾 Save Story
+          </button>
         </>
       )}
 
-      <p>{message}</p>
+      <p style={{ color: 'crimson', marginTop: '1rem' }}>{message}</p>
     </div>
   );
 }
+
+const btnStyle = {
+  padding: '0.5rem 1rem',
+  background: '#111',
+  color: 'white',
+  borderRadius: '8px',
+  border: 'none',
+  cursor: 'pointer',
+  marginBottom: '1rem'
+};
 
 export default Write;
